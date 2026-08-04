@@ -689,7 +689,7 @@ DynamicPartitionControlAndroid::IsAvbEnabledOnSystemOther() {
   auto prefix = GetProperty(kPostinstallFstabPrefix, "");
   if (prefix.empty()) {
     LOG(WARNING) << "Cannot get " << kPostinstallFstabPrefix;
-    return std::nullopt;
+    return false;
   }
   auto path = base::FilePath(prefix).Append("etc/fstab.postinstall").value();
   return IsAvbEnabledInFstab(path);
@@ -1545,7 +1545,7 @@ bool DynamicPartitionControlAndroid::MapAllPartitions() {
   // This flag tells us if VAB is enabled. In the case it's not (e.g. for
   // secondary payloads) we are falling back on A/B and MapAllPartitions should
   // just be a no-op
-  if (!target_supports_snapshot_) {
+  if (!target_supports_snapshot_ || recovery_fallback_to_direct_update_) {
     return true;
   }
   return GetSnapshotManager()->MapAllSnapshots(kMapSnapshotTimeout);
